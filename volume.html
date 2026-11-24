@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réglage du volume</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🔊 Réglage du volume</h1>
+
+  <div class="encart">
+    <p>Pour des raisons de sécurité, le volume du site ne peut être baissé qu'en faisant <strong>le plus de bruit possible</strong> dans votre microphone.</p>
+    <p>Plus vous criez fort, plus le son baisse. Logique.</p>
+    <p class="petit">Le volume remonte tout seul de 1 % toutes les 4 secondes, pour votre confort.</p>
+  </div>
+
+  <div id="gros-vol">80 %</div>
+
+  <div class="encart">
+    <button id="micro">Activer le micro (obligatoire)</button>
+    <div class="jauge" aria-label="Niveau sonore"><div id="niveau"></div></div>
+    <p id="message">En attente de bruit…</p>
+    <p>Votre record : <strong id="record">0</strong> décibels-ish</p>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    (function () {
+      const { getVol, setVol, LS } = window.PIRE;
+      const gros = document.getElementById('gros-vol');
+      const niveau = document.getElementById('niveau');
+      const message = document.getElementById('message');
+      const recordEl = document.getElementById('record');
+      let record = LS.get('recordCri', 0);
+      recordEl.textContent = record;
+
+      const majGros = () => { gros.textContent = getVol() + ' %'; };
+      document.addEventListener('volume', majGros);
+      majGros();
+
+      const SEUIL = 55; // en dessous : ça ne compte pas
+      document.getElementById('micro').addEventListener('click', async () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          message.textContent = "Votre navigateur refuse le micro. Ouvrez le site via http://localhost pour pouvoir hurler.";
+          return;
+        }
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+          });
+        } catch (e) {
+          message.textContent = 'Sans micro, pas de baisse de volume. C’est la loi.';
+          return;
+        }
+        const AC = window.AudioContext || window.webkitAudioContext;
+        const ac = new AC();
+        const analyseur = ac.createAnalyser();
+        analyseur.fftSize = 2048;
+        ac.createMediaStreamSource(stream).connect(analyseur);
+        const buf = new Float32Array(analyseur.fftSize);
+        let accu = 0;
+
+        (function boucle() {
+          analyseur.getFloatTimeDomainData(buf);
+          let s = 0;
+          for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i];
+          const rms = Math.sqrt(s / buf.length);
+          const dbfs = 20 * Math.log10(rms + 1e-8);            // -160 .. 0
+          const pct = Math.max(0, Math.min(100, (dbfs + 60) / 60 * 100));
+          niveau.style.width = pct + '%';
+
+          const db = Math.max(0, Math.round(dbfs + 100));
+          if (db > record) { record = db; recordEl.textContent = record; LS.set('recordCri', record); }
+
+          if (pct > SEUIL) {
+            accu += ((pct - SEUIL) / (100 - SEUIL)) * 0.15;
+            if (accu >= 1) { const d = Math.floor(accu); accu -= d; setVol(getVol() - d); }
+          }
+
+          if (getVol() === 0) message.textContent = 'Bravo, volume à 0 %. Il va remonter dans quelques secondes. 🙂';
+          else if (pct < 30) message.textContent = "On n'entend rien. Vous chuchotez ?";
+          else if (pct < SEUIL) message.textContent = 'Plus fort !';
+          else if (pct < 75) message.textContent = 'ENCORE PLUS FORT !! Les voisins ne vous entendent pas encore.';
+          else message.textContent = 'OUIIIII !!! CONTINUEZ !!! 📉';
+
+          requestAnimationFrame(boucle);
+        })();
+      });
+    })();
+  </script>
+</body>
+</html>

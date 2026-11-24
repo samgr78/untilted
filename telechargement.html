@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Téléchargement de votre statistique</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Préparation de votre statistique</h1>
+  <div class="encart">
+    <p id="titre-stat"></p>
+    <div class="jauge"><div id="progression"></div></div>
+    <p id="etape">Initialisation…</p>
+    <p id="fin" hidden></p>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="stats-data.js"></script>
+  <script>
+    (function () {
+      const id = new URLSearchParams(location.search).get('stat');
+      const stat = window.STATS.find(s => s.id === id);
+      const barre = document.getElementById('progression');
+      const etape = document.getElementById('etape');
+      const fin = document.getElementById('fin');
+
+      if (!stat) {
+        etape.textContent = "Statistique introuvable. Elle a peut-être déjà été téléchargée par quelqu'un d'autre.";
+        return;
+      }
+      document.getElementById('titre-stat').textContent = '« ' + stat.titre + ' »';
+
+      const ETAPES = [
+        [8, 500, 'Connexion au satellite…'],
+        [23, 900, 'Comptage manuel en cours…'],
+        [41, 800, 'Vérification par un stagiaire…'],
+        [67, 700, 'Arrondi des décimales…'],
+        [99, 600, 'Presque fini…'],
+        [99, 2500, 'Toujours presque fini…'],
+        [14, 400, 'Oups. On recommence.'],
+        [99, 1200, 'Compression du nombre…'],
+        [100, 800, 'Emballage du nombre dans un fichier .txt…']
+      ];
+
+      let i = 0;
+      (function suivante() {
+        if (i >= ETAPES.length) return telecharger();
+        const [pct, delai, msg] = ETAPES[i++];
+        barre.style.width = pct + '%';
+        etape.textContent = msg + ' (' + pct + ' %)';
+        setTimeout(suivante, delai);
+      })();
+
+      function telecharger() {
+        const valeur = stat.calc();
+        const blob = new Blob([valeur + '\n'], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = stat.id + '.txt';
+        a.click();
+        etape.textContent = 'Téléchargement terminé.';
+        fin.hidden = false;
+        fin.innerHTML = `Votre statistique « en temps réel » est désormais figée à jamais dans <strong>${stat.id}.txt</strong>.<br>
+          Elle est déjà obsolète.<br><br>
+          <a href="${url}" download="${stat.id}.txt">Si rien ne s'est passé, cliquez ici.</a><br><br>
+          <button data-href="telechargement.html?stat=${stat.id}">Re-télécharger (la stat a changé)</button>`;
+      }
+    })();
+  </script>
+</body>
+</html>

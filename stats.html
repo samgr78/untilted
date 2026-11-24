@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statistiques en temps réel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <marquee scrollamount="20">📊 DONNÉES EN DIRECT 📊 MISES À JOUR EN TEMPS RÉEL 📊 SAUF QUAND VOUS LES REGARDEZ 📊</marquee>
+  <h1>📊 Statistiques en temps réel</h1>
+
+  <div class="encart">
+    <p>Pour garantir la confidentialité des données, chaque statistique vous est livrée sous la forme d'un <strong>fichier .txt</strong> à télécharger.</p>
+    <p class="petit">Les valeurs sont floutées à l'écran conformément à la directive européenne imaginaire 2024/404.</p>
+  </div>
+
+  <div id="grille" class="grille"></div>
+
+  <div class="encart">
+    <h2>Graphique</h2>
+    <div class="camembert" role="img" aria-label="Camembert entièrement jaune"></div>
+    <p style="text-align:center">Part du camembert qui est du camembert : <strong>100 %</strong></p>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="stats-data.js"></script>
+  <script>
+    const grille = document.getElementById('grille');
+    grille.innerHTML = window.STATS.map(s => `
+      <div class="carte">
+        <h3>${s.titre}</h3>
+        <p>Valeur : <span class="floue">█ ███ ███</span></p>
+        <p class="petit">Dernière consultation : jamais</p>
+        <button data-href="telechargement.html?stat=${s.id}">Voir la stat en temps réel (.txt)</button>
+      </div>`).join('');
+  </script>
+</body>
+</html>

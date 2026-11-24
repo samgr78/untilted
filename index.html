@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le Site Le Plus Utile™</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <marquee scrollamount="12">★ BIENVENUE ★ Ce site est optimisé pour Internet Explorer 4 en 800×600 ★ Dernière mise à jour : 12/03/1998 ★ 🚧 Site en construction depuis toujours 🚧 ★</marquee>
+
+  <h1>Bienvenue sur le Site Le Plus Utile™</h1>
+
+  <div class="encart">
+    <p>Choisissez une rubrique ci-dessous. <strong class="clignote">Chaque rubrique s'ouvre dans un nouvel onglet</strong>, pour votre confort.</p>
+    <p class="petit">Il n'y a pas de bouton « retour ». C'est voulu.</p>
+  </div>
+
+  <nav class="menu" aria-label="Menu principal">
+    <button data-href="stats.html">Statistiques en temps réel (très très importantes)</button>
+    <button data-href="volume.html">Baisser le son</button>
+    <button data-href="page.html?id=a-propos">À propos</button>
+    <button data-href="page.html?id=vide">Page vide</button>
+    <button data-href="page.html?id=chargement">Chargement</button>
+    <button data-href="page.html?id=contact">Nous contacter (déconseillé)</button>
+    <button data-href="page.html?id=meteo-hier">Météo d'hier</button>
+    <button data-href="page.html?id=boutique">Boutique</button>
+    <button data-href="page.html?id=faq">FAQ</button>
+    <button data-href="page.html?id=plan">Plan du site</button>
+    <button data-href="page.html?id=parametres">Paramètres</button>
+    <button data-href="page.html?id=mentions">Mentions illégales</button>
+    <button data-href="page.html?id=compteur">Compteur de visiteurs</button>
+    <button data-href="page.html?id=horloge">Horloge (en retard)</button>
+    <button data-href="page.html?id=page-suivante">Page suivante</button>
+    <button data-href="page.html?id=bouton-interdit">Ne pas cliquer</button>
+    <button data-href="page.html?id=erreur">Erreur 200</button>
+  </nav>
+
+  <!-- CONTRAT D'UTILISATION -->
+  <div id="contrat" class="contrat" hidden>
+    <div class="contrat-boite" role="dialog" aria-modal="true" aria-labelledby="contrat-titre">
+      <span id="fausse-croix" title="Fermer">✖</span>
+      <h2 id="contrat-titre">Contrat d'utilisation (version 48.2.1-bêta-final-v3)</h2>
+      <p class="contrat-info">Veuillez faire défiler jusqu'en bas du contrat pour pouvoir l'accepter.</p>
+      <div id="contrat-texte" class="contrat-texte">
+        <div id="articles"></div>
+        <button id="accepter">J'accepte</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="contrat.js"></script>
+</body>
+</html>
