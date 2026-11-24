@@ -25,3 +25,5 @@ python3 -m http.server 8000
 | Baisser le son en criant dans le micro | `volume.html` (le curseur du bas ne fait que monter le son) |
 
 Le contrat réapparaît 3 minutes après avoir été accepté.
+
+Le contrat se termine vers l'article 120 (entre 118 et 123, ça change à chaque fois). Le bouton « J'accepte » lance l'animation d'apocalypse interdimensionnelle (`animation.js`), qui ramène ensuite à une nouvelle version du contrat, à relire depuis le début.

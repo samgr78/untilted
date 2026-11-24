@@ -40,11 +40,17 @@
   ];
   const SUFFIXES = ['', ' (bis)', ' (ter)', ' (quater)', ' (quinquies)', ' (sexies)'];
 
+  // Le contrat a une vraie fin… vers l'article 120 (à quelques articles près, ça change à chaque fois).
+  const FIN = 118 + Math.floor(Math.random() * 6);
+
   let n = 0;
   function ajouterArticle() {
+    if (n >= FIN) return;
     n++;
     const p = document.createElement('p');
-    if (n === 3) {
+    if (n === FIN) {
+      p.innerHTML = `<strong>Article ${n} et dernier.</strong> Le présent contrat prend fin ici. Félicitations : vous êtes la première personne à l'avoir lu en entier. En cliquant sur le bouton ci-dessous, vous acceptez l'ensemble des ${n} articles, ainsi que toutes leurs conséquences, y compris dimensionnelles.`;
+    } else if (n === 3) {
       p.innerHTML = '<strong>Article 3.</strong> Le présent contrat est valable 24 h sur 24 et 7 jours sur 7, soit 24 <span id="vraie-croix">×</span> 7 = 168 heures par semaine, renouvelables tacitement jusqu\'à la fin des temps, et même un peu après.';
     } else {
       const base = CLAUSES[(n - 1) % CLAUSES.length] || CLAUSES[0];
@@ -57,7 +63,7 @@
   }
   for (let i = 0; i < 40; i++) ajouterArticle();
 
-  // Infini : dès qu'on approche du bas, on rajoute des articles.
+  // « Infini » : dès qu'on approche du bas, on rajoute des articles (jusqu'à la fin).
   function verifierFin() {
     if (texte.scrollTop + texte.clientHeight > texte.scrollHeight - 400) {
       for (let i = 0; i < 10; i++) ajouterArticle();
@@ -100,9 +106,26 @@
     toast('Contrat accepté. Votre acceptation expirera dans 3 minutes.');
     ouvrir('page.html?id=merci-contrat');
   }
-  document.getElementById('vraie-croix').addEventListener('click', fermer);
-  // Si par miracle quelqu'un atteint le bas :
-  document.getElementById('accepter').addEventListener('click', fermer);
+  articles.addEventListener('click', e => { if (e.target.id === 'vraie-croix') fermer(); });
+
+  // Remet le contrat à zéro (nouvelle version, tout en haut).
+  function reinitialiser() {
+    articles.innerHTML = '';
+    n = 0;
+    for (let i = 0; i < 40; i++) ajouterArticle();
+    texte.scrollTop = 0;
+    document.getElementById('contrat-titre').textContent =
+      `Contrat d'utilisation (version ${48 + Math.floor(Math.random() * 50)}.${Math.floor(Math.random() * 9)}.${Math.floor(Math.random() * 9)}-bêta-final-v${Math.floor(Math.random() * 9) + 4})`;
+    toast('Une nouvelle version du contrat est disponible. Veuillez la relire depuis le début.');
+  }
+
+  // Quelqu'un a atteint le bas et accepte : apocalypse interdimensionnelle, puis retour au contrat.
+  let enCours = false;
+  document.getElementById('accepter').addEventListener('click', () => {
+    if (enCours) return;
+    enCours = true;
+    window.animationApocalypse(() => { reinitialiser(); enCours = false; });
+  });
 
   // La fausse croix s'enfuit.
   fausseCroix.addEventListener('mouseenter', () => {
