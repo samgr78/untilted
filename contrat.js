@@ -12,6 +12,7 @@
   const texte = document.getElementById('contrat-texte');
   const articles = document.getElementById('articles');
   const fausseCroix = document.getElementById('fausse-croix');
+  const croixSecrete = document.getElementById('croix-secrete');
 
   if (Date.now() - LS.get('contratAccepte', 0) < VALIDITE) return;
 
@@ -126,6 +127,8 @@
     enCours = true;
     window.animationApocalypse(() => { reinitialiser(); enCours = false; });
   });
+  // Troisième croix, planquée dans le coin de la page, quasi invisible à l'œil nu.
+  croixSecrete.addEventListener('click', fermer);
 
   // La fausse croix s'enfuit.
   fausseCroix.addEventListener('mouseenter', () => {

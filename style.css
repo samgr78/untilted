@@ -221,6 +221,18 @@ button.tri:active { transform: rotate(var(--rot, 0deg)) scale(.8); }
   z-index: 2;
 }
 
+/* La vraie vraie croix : coin supérieur droit de la page, quasi invisible. */
+#croix-secrete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  opacity: .02;
+  cursor: default;
+  z-index: 1001;
+}
+
 /* ------------------------------------------------------------
    STATISTIQUES
    ------------------------------------------------------------ */

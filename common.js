@@ -3,7 +3,7 @@
    - chaque action ouvre un nouvel onglet
    - tous les boutons deviennent des triangles
    - la barre de recherche est le seul moyen de revenir au menu
-   - le volume ne peut que monter (sauf en criant, voir volume.html)
+   - le volume ne peut que monter, jamais baisser (crier dans le micro accélère la hausse, voir volume.html)
    ============================================================ */
 (function () {
   'use strict';
@@ -59,7 +59,7 @@
   });
 
   // ---------- Volume ----------
-  const getVol = () => Math.max(0, Math.min(100, Number(LS.get('volume', 80)) || 0));
+  const getVol = () => Math.max(0, Math.min(100, Number(LS.get('volume', 15)) || 0));
   let audioCtx = null, master = null;
 
   function appliquerVolume() {
@@ -153,7 +153,7 @@
     sl.addEventListener('change', () => {
       if (tentative) {
         tentative = false;
-        toast('Pour baisser le son, faites du bruit. Beaucoup de bruit.');
+        toast('Impossible de baisser le son. Pour l’augmenter plus vite, faites du bruit. Beaucoup de bruit.');
         ouvrir('volume.html');
       }
     });

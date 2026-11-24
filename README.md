@@ -22,7 +22,8 @@ python3 -m http.server 8000
 | Chaque action ouvre un nouvel onglet | `common.js` (`ouvrir`) |
 | Plein de pages inutiles | `page.html` + `pages.js` |
 | Stats inutiles livrées en `.txt` | `stats.html`, `stats-data.js`, `telechargement.html` |
-| Baisser le son en criant dans le micro | `volume.html` (le curseur du bas ne fait que monter le son) |
+| Musique d'ascenseur générée en direct, impossible à baisser | `common.js` (`demarrerMusique`, démarre au premier clic/touche) |
+| Augmenter le son en criant dans le micro, jamais le baisser | `volume.html` (le curseur du bas ne fait aussi que monter le son) |
 
 Le contrat réapparaît 3 minutes après avoir été accepté.
 
