@@ -10,12 +10,12 @@
   <h1>🔊 Réglage du volume</h1>
 
   <div class="encart">
-    <p>Pour des raisons de sécurité, le volume du site ne peut être baissé qu'en faisant <strong>le plus de bruit possible</strong> dans votre microphone.</p>
-    <p>Plus vous criez fort, plus le son baisse. Logique.</p>
-    <p class="petit">Le volume remonte tout seul de 1 % toutes les 4 secondes, pour votre confort.</p>
+    <p>Pour des raisons de sécurité, le volume du site ne peut être augmenté <em>rapidement</em> qu'en faisant <strong>le plus de bruit possible</strong> dans votre microphone.</p>
+    <p>Plus vous criez fort, plus le son monte. Il est en revanche totalement impossible de le baisser. Logique.</p>
+    <p class="petit">Le volume monte aussi tout seul de 1 % toutes les 4 secondes, pour votre confort.</p>
   </div>
 
-  <div id="gros-vol">80 %</div>
+  <div id="gros-vol">15 %</div>
 
   <div class="encart">
     <button id="micro">Activer le micro (obligatoire)</button>
@@ -51,7 +51,7 @@
             audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
           });
         } catch (e) {
-          message.textContent = 'Sans micro, pas de baisse de volume. C’est la loi.';
+          message.textContent = 'Sans micro, le volume n’augmentera que tout seul, lentement. C’est la loi.';
           return;
         }
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -76,14 +76,14 @@
 
           if (pct > SEUIL) {
             accu += ((pct - SEUIL) / (100 - SEUIL)) * 0.15;
-            if (accu >= 1) { const d = Math.floor(accu); accu -= d; setVol(getVol() - d); }
+            if (accu >= 1) { const d = Math.floor(accu); accu -= d; setVol(getVol() + d); }
           }
 
-          if (getVol() === 0) message.textContent = 'Bravo, volume à 0 %. Il va remonter dans quelques secondes. 🙂';
+          if (getVol() === 100) message.textContent = 'Bravo, volume à 100 %. Il ne peut plus monter. 🙂';
           else if (pct < 30) message.textContent = "On n'entend rien. Vous chuchotez ?";
           else if (pct < SEUIL) message.textContent = 'Plus fort !';
           else if (pct < 75) message.textContent = 'ENCORE PLUS FORT !! Les voisins ne vous entendent pas encore.';
-          else message.textContent = 'OUIIIII !!! CONTINUEZ !!! 📉';
+          else message.textContent = 'OUIIIII !!! CONTINUEZ !!! 📈';
 
           requestAnimationFrame(boucle);
         })();
