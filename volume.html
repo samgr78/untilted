@@ -10,12 +10,12 @@
   <h1>🔊 Réglage du volume</h1>
 
   <div class="encart">
-    <p>Pour des raisons de sécurité, le volume du site ne peut être augmenté <em>rapidement</em> qu'en faisant <strong>le plus de bruit possible</strong> dans votre microphone.</p>
-    <p>Plus vous criez fort, plus le son monte. Il est en revanche totalement impossible de le baisser. Logique.</p>
-    <p class="petit">Le volume monte aussi tout seul de 1 % toutes les 4 secondes, pour votre confort.</p>
+    <p>Le volume part de 0 et ne monte normalement qu'en spammant la barre espace. Ici, pour des raisons de sécurité, il peut aussi monter <em>rapidement</em> en faisant <strong>le plus de bruit possible</strong> dans votre microphone.</p>
+    <p>Plus vous criez fort, plus le son monte. Mais attention : si vous arrêtez de faire du bruit (ou de spammer espace), il redescend tout seul, 1 % par seconde.</p>
+    <p class="petit">Impossible de le baisser manuellement avec le curseur du bas, en revanche.</p>
   </div>
 
-  <div id="gros-vol">15 %</div>
+  <div id="gros-vol">0 %</div>
 
   <div class="encart">
     <button id="micro">Activer le micro (obligatoire)</button>
@@ -51,7 +51,7 @@
             audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
           });
         } catch (e) {
-          message.textContent = 'Sans micro, le volume n’augmentera que tout seul, lentement. C’est la loi.';
+          message.textContent = 'Sans micro, il faudra spammer la barre espace. C’est la loi.';
           return;
         }
         const AC = window.AudioContext || window.webkitAudioContext;

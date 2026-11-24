@@ -22,8 +22,10 @@ python3 -m http.server 8000
 | Chaque action ouvre un nouvel onglet | `common.js` (`ouvrir`) |
 | Plein de pages inutiles | `page.html` + `pages.js` |
 | Stats inutiles livrées en `.txt` | `stats.html`, `stats-data.js`, `telechargement.html` |
-| Musique d'ascenseur générée en direct, impossible à baisser | `common.js` (`demarrerMusique`, démarre au premier clic/touche) |
-| Augmenter le son en criant dans le micro, jamais le baisser | `volume.html` (le curseur du bas ne fait aussi que monter le son) |
+| Musique d'ascenseur générée en direct | `common.js` (`demarrerMusique`, démarre au premier clic/touche) |
+| Le son part de 35 et ne monte qu'en spammant la barre espace (2 appuis = +1 %) ; il redescend tout seul (1 % / s) dès qu'on arrête | `common.js` — le curseur du bas, lui, ne fait toujours que monter |
+| Sous 30 % de volume, le site entier se bloque (explosions plein écran, écran qui tremble) jusqu'à ce qu'on remonte le son | `common.js` (`majBlocageVolume`) + `style.css` (`#vol-bloque`) |
+| Augmenter le son plus vite en criant dans le micro | `volume.html` |
 
 Le contrat réapparaît 3 minutes après avoir été accepté.
 

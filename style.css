@@ -271,6 +271,62 @@ button.tri:active { transform: rotate(var(--rot, 0deg)) scale(.8); }
 }
 
 /* ------------------------------------------------------------
+   BLOCAGE : SON TROP BAS
+   ------------------------------------------------------------ */
+body.bloque-volume { overflow: hidden; }
+
+#vol-bloque {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  cursor: default;
+  animation: vol-bloque-secoue .35s ease-in-out infinite, vol-bloque-flash 1.1s ease-in-out infinite;
+}
+
+#vol-bloque canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vol-bloque-texte {
+  position: relative;
+  z-index: 1;
+  max-width: 90vw;
+  text-align: center;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(20px, 5vw, 44px);
+  line-height: 1.35;
+  color: #ff3b3b;
+  text-shadow: 0 0 10px #ff0000, 0 0 30px #ff0000, 0 0 60px #ff8800;
+  text-transform: uppercase;
+  animation: vol-bloque-clignote .5s steps(2) infinite;
+}
+
+.petit-rouge { font-size: .5em; color: #ffaaaa; text-shadow: none; }
+
+@keyframes vol-bloque-secoue {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-6px, 4px); }
+  50% { transform: translate(5px, -5px); }
+  75% { transform: translate(-4px, -3px); }
+}
+
+@keyframes vol-bloque-flash {
+  0%, 100% { background: #000; }
+  50% { background: #330000; }
+}
+
+@keyframes vol-bloque-clignote {
+  50% { opacity: .35; }
+}
+
+/* ------------------------------------------------------------
    STATISTIQUES
    ------------------------------------------------------------ */
 .grille {

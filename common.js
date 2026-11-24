@@ -3,7 +3,8 @@
    - chaque action ouvre un nouvel onglet
    - tous les boutons deviennent des triangles
    - la barre de recherche est le seul moyen de revenir au menu
-   - le volume ne peut que monter, jamais baisser (crier dans le micro accélère la hausse, voir volume.html)
+   - le volume part de 0 et ne monte qu'en spammant la barre espace ; il redescend
+     tout seul de 1 toutes les 5 secondes dès qu'on arrête
    ============================================================ */
 (function () {
   'use strict';
@@ -59,7 +60,12 @@
   });
 
   // ---------- Volume ----------
-  const getVol = () => Math.max(0, Math.min(100, Number(LS.get('volume', 15)) || 0));
+  // Migration unique : remise à 35 au passage vers ce système.
+  if (!LS.get('volumeReset35', false)) {
+    LS.set('volume', 35);
+    LS.set('volumeReset35', true);
+  }
+  const getVol = () => Math.max(0, Math.min(100, Number(LS.get('volume', 0)) || 0));
   let audioCtx = null, master = null;
 
   function appliquerVolume() {
@@ -80,8 +86,114 @@
     if (e.key === 'onglets') afficherOnglets();
   });
 
-  // Le volume remonte tout seul, doucement, inexorablement.
-  setInterval(() => { if (!document.hidden) setVol(getVol() + 1); }, 4000);
+  // ---------- Blocage total si le son est trop bas ----------
+  const SEUIL_BLOCAGE = 30;
+  let volBloqueEl = null, volBloqueRaf = null, volBloqueTimer = null;
+  const volBloqueParts = [];
+
+  // Bruit d'explosion : branché direct sur la sortie (pas sur le volume du site,
+  // sinon on n'entendrait jamais l'alerte quand le son est justement trop bas).
+  function volBloqueBoom(force) {
+    if (!audioCtx) return;
+    const len = Math.floor(audioCtx.sampleRate * 0.45);
+    const b = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const s = audioCtx.createBufferSource();
+    s.buffer = b;
+    const f = audioCtx.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.value = 180 + Math.random() * 420;
+    const g = audioCtx.createGain();
+    g.gain.value = 0.55 * (force || 1);
+    s.connect(f); f.connect(g); g.connect(audioCtx.destination);
+    s.start();
+  }
+
+  function volBloqueExplosion(x, y) {
+    const teinte = Math.random() * 50; // rouge/orange
+    for (let i = 0; i < 36; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const v = 2 + Math.random() * 9;
+      volBloqueParts.push({
+        x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+        vie: 1, dec: 0.015 + Math.random() * 0.02, taille: 2 + Math.random() * 4,
+        coul: `hsl(${teinte + Math.random() * 20}, 100%, 55%)`
+      });
+    }
+    volBloqueBoom(0.6 + Math.random() * 0.6);
+  }
+
+  function demarrerBlocageVolume() {
+    volBloqueEl = document.createElement('div');
+    volBloqueEl.id = 'vol-bloque';
+    volBloqueEl.innerHTML = `
+      <canvas></canvas>
+      <div class="vol-bloque-texte">💥 ALERTE 💥<br>VOLUME INSUFFISANT<br><span class="petit-rouge">Le site est entièrement à l'arrêt.</span><br>SPAMMEZ LA BARRE ESPACE<br>pour remonter le son au-dessus de ${SEUIL_BLOCAGE} %</div>`;
+    document.body.appendChild(volBloqueEl);
+    document.body.classList.add('bloque-volume');
+
+    const cv = volBloqueEl.querySelector('canvas');
+    const ctx = cv.getContext('2d');
+    function taille() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+    taille();
+    window.addEventListener('resize', taille);
+
+    (function boucleExplosions() {
+      if (!volBloqueEl) return;
+      volBloqueExplosion(Math.random() * cv.width, Math.random() * cv.height * 0.85);
+      volBloqueTimer = setTimeout(boucleExplosions, 220);
+    })();
+
+    function image() {
+      if (!volBloqueEl) return;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = volBloqueParts.length - 1; i >= 0; i--) {
+        const p = volBloqueParts[i];
+        p.vy += 0.1; p.x += p.vx; p.y += p.vy; p.vie -= p.dec;
+        if (p.vie <= 0) { volBloqueParts.splice(i, 1); continue; }
+        ctx.globalAlpha = Math.max(0, p.vie);
+        ctx.fillStyle = p.coul;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.taille * p.vie + 1, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      volBloqueRaf = requestAnimationFrame(image);
+    }
+    image();
+
+    volBloqueEl._nettoyer = () => window.removeEventListener('resize', taille);
+  }
+
+  function arreterBlocageVolume() {
+    cancelAnimationFrame(volBloqueRaf);
+    clearTimeout(volBloqueTimer);
+    volBloqueEl._nettoyer();
+    volBloqueEl.remove();
+    volBloqueEl = null;
+    volBloqueParts.length = 0;
+    document.body.classList.remove('bloque-volume');
+  }
+
+  function majBlocageVolume() {
+    const bloque = getVol() < SEUIL_BLOCAGE;
+    if (bloque && !volBloqueEl) demarrerBlocageVolume();
+    else if (!bloque && volBloqueEl) arreterBlocageVolume();
+  }
+  document.addEventListener('volume', majBlocageVolume);
+
+  // Le volume ne monte qu'en spammant la barre espace : 2 appuis = +1 %.
+  function estSaisie(el) { return el && /^(input|textarea|select)$/i.test(el.tagName); }
+  let appuisEspace = 0;
+  document.addEventListener('keydown', e => {
+    if ((e.code !== 'Space' && e.key !== ' ') || estSaisie(e.target)) return;
+    e.preventDefault();
+    appuisEspace++;
+    if (appuisEspace >= 2) { appuisEspace -= 2; setVol(getVol() + 1); }
+  });
+
+  // Et il redescend tout seul, 1 % toutes les secondes, dès qu'on arrête de spammer.
+  setInterval(() => { if (!document.hidden) setVol(getVol() - 1); }, 1000);
 
   // Musique d'ascenseur (légèrement fausse), générée en direct.
   function demarrerMusique() {
@@ -153,8 +265,7 @@
     sl.addEventListener('change', () => {
       if (tentative) {
         tentative = false;
-        toast('Impossible de baisser le son. Pour l’augmenter plus vite, faites du bruit. Beaucoup de bruit.');
-        ouvrir('volume.html');
+        toast('Impossible de baisser le son avec le curseur. Spammez la barre espace pour l’augmenter, il redescend tout seul sinon.');
       }
     });
 
