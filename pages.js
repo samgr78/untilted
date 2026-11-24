@@ -231,7 +231,13 @@
       titre: 'Erreur 200',
       html: () => `<div class="encart"><p><strong>Erreur 200 — OK.</strong></p>
         <p>Tout fonctionne normalement. Nous ne savons pas pourquoi vous êtes ici.</p></div>`
-    }
+    },
+
+      'important-offre':{
+          titre: 'Offre de Bienvenu Important',
+          html:() => '<div class="encart"><p>Cliquer sur le le lien pour acceder a loffre</p> <a href="https://samuelgallianiroyer.fr ">Offre -20%</a> <a href="https://www.iledefrance.fr/decouvrir-la-richesse-du-patrimoine/patrimoine-artistique-et-architectural/le-domaine-de-villarceaux">Offre -20%</a> <a href="https://youtu.be/bDYNNDKcYxA?si=iNf4d7HqEL4xsJpG&t=7">Offre -70 PUTAIN CEST EXEPTIONNELLE CLQIQUE VITE VITE VITE</a>'
+      },
+
   };
 
   const page = PAGES[id] || PAGES.erreur;
